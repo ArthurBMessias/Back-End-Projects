@@ -21,4 +21,4 @@ const createTalker = async (req, res) => {
       return res.status(201).send(newTalker);
     };
 
-module.exports = {createTalker};
+module.exports = { createTalker };

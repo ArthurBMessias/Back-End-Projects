@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const fs = require('fs/promises');
 const rescue = require('express-rescue');
-const { readFile, writeFile } = require('./utils/readFile');
+const { readFile } = require('./utils/readFile');
 const {
   getLoginToken,
   isValidEmail,
@@ -16,6 +16,7 @@ const {
 } = require('./middlewares/validations');
 const { createTalker } = require('./middlewares/createTalker');
 const { editTalker } = require('./middlewares/editTalker');
+const { deleteTalker } = require('./middlewares/deleteTalker');
 
 const app = express();
 app.use(bodyParser.json());
@@ -60,6 +61,8 @@ app.post('/talker', validToken, validName, validAge, validTalk, validDate, valid
 
 app.put('/talker/:id', 
 validToken, validName, validAge, validTalk, validDate, validRate, editTalker);
+
+app.delete('/talker/:id', validToken, deleteTalker);
 
 app.listen(PORT, () => {
   console.log('Online');
