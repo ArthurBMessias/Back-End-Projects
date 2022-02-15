@@ -58,7 +58,8 @@ app.post('/login', isValidEmail, isValidPassword, getLoginToken);
 
 app.post('/talker', validToken, validName, validAge, validTalk, validDate, validRate, createTalker);
 
-app.put('/talker/:id', validToken, validName, validAge, validTalk, validDate, validRate, editTalker);
+app.put('/talker/:id', 
+validToken, validName, validAge, validTalk, validDate, validRate, editTalker);
 
 app.listen(PORT, () => {
   console.log('Online');
