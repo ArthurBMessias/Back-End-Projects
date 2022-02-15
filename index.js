@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const rescue = require('express-rescue');
+const { readFile } = require('./utils/readFile');
 
 const app = express();
 app.use(bodyParser.json());
@@ -11,6 +13,18 @@ const PORT = '3000';
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
+
+app.get(
+  '/talker',
+  rescue(async (_req, res) => {
+    const talkers = await readFile();
+    if (!talkers) {
+      return res.status(HTTP_OK_STATUS).json([]);
+    }
+
+    return res.status(HTTP_OK_STATUS).json(talkers);
+  }),
+);
 
 app.listen(PORT, () => {
   console.log('Online');
