@@ -17,6 +17,7 @@ const {
 const { createTalker } = require('./middlewares/createTalker');
 const { editTalker } = require('./middlewares/editTalker');
 const { deleteTalker } = require('./middlewares/deleteTalker');
+const { searchTalker } = require('./middlewares/searchTalker');
 
 const app = express();
 app.use(bodyParser.json());
@@ -36,11 +37,13 @@ app.get(
     if (!talkers) {
       return res.status(200).json([]);
     }
-
+    
     return res.status(200).json(talkers);
   }),
-);
+  );
 
+app.get('/talker/search', validToken, searchTalker);
+  
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
   const talkers = await readFile('./talker.json');
