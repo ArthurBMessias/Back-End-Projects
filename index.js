@@ -2,9 +2,18 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const fs = require('fs/promises');
 const rescue = require('express-rescue');
-const { readFile } = require('./utils/readFile');
-const { getLoginToken } = require('./middlewares/validations');
-const { isValidEmail, isValidPassword } = require('./middlewares/validations');
+const { readFile, writeFile } = require('./utils/readFile');
+const {
+  getLoginToken,
+  isValidEmail,
+  isValidPassword,
+  validToken,
+  validName,
+  validAge,
+  validTalk,
+  validDate,
+  validRate,
+} = require('./middlewares/validations');
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,7 +29,7 @@ app.get('/', (_request, response) => {
 app.get(
   '/talker',
   rescue(async (_req, res) => {
-    const talkers = await readFile();
+    const talkers = await readFile('./talker.json');
     if (!talkers) {
       return res.status(200).json([]);
     }
@@ -31,7 +40,7 @@ app.get(
 
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
-  const talkers = await readFile();
+  const talkers = await readFile('./talker.json');
   const findTalkerById = talkers.find((talker) => talker.id === Number(id));
 
   if (!findTalkerById) {
@@ -44,6 +53,36 @@ app.get('/talker/:id', async (req, res) => {
 });
 
 app.post('/login', isValidEmail, isValidPassword, getLoginToken);
+
+app.post(
+  '/talker',
+  validToken,
+  validName,
+  validAge,
+  validTalk,
+  validDate,
+  validRate,
+  rescue(async (req, res) => { 
+    const {
+      name,
+      age,
+      talk: { watchedAt, rate },
+    } = req.body;
+    const talkers = await readFile('./talker.json');
+    const newTalker = {
+      name,
+      age,
+      id: JSON.parse(talkers.length + 1),
+      talk: {
+        watchedAt,
+        rate,
+      },
+    };
+    talkers.push(newTalker);
+    await writeFile(talkers);
+    return res.status(201).send(newTalker);
+  }),
+);
 
 app.listen(PORT, () => {
   console.log('Online');
