@@ -14,6 +14,8 @@ const {
   validDate,
   validRate,
 } = require('./middlewares/validations');
+const { createTalker } = require('./middlewares/createTalker');
+const { editTalker } = require('./middlewares/editTalker');
 
 const app = express();
 app.use(bodyParser.json());
@@ -54,35 +56,9 @@ app.get('/talker/:id', async (req, res) => {
 
 app.post('/login', isValidEmail, isValidPassword, getLoginToken);
 
-app.post(
-  '/talker',
-  validToken,
-  validName,
-  validAge,
-  validTalk,
-  validDate,
-  validRate,
-  rescue(async (req, res) => { 
-    const {
-      name,
-      age,
-      talk: { watchedAt, rate },
-    } = req.body;
-    const talkers = await readFile('./talker.json');
-    const newTalker = {
-      name,
-      age,
-      id: JSON.parse(talkers.length + 1),
-      talk: {
-        watchedAt,
-        rate,
-      },
-    };
-    talkers.push(newTalker);
-    await writeFile(talkers);
-    return res.status(201).send(newTalker);
-  }),
-);
+app.post('/talker', validToken, validName, validAge, validTalk, validDate, validRate, createTalker);
+
+app.put('/talker/:id', validToken, validName, validAge, validTalk, validDate, validRate, editTalker);
 
 app.listen(PORT, () => {
   console.log('Online');
